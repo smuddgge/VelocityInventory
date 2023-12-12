@@ -1,6 +1,5 @@
 package com.github.smuddgge.velocityinventory.slot.slot;
 
-import com.github.smuddgge.leaf.MessageManager;
 import com.github.smuddgge.velocityinventory.slot.SlotType;
 import dev.simplix.protocolize.data.inventory.InventoryType;
 
@@ -20,8 +19,7 @@ public class CenterSlotType implements SlotType {
             return new int[]{4 + (col * 9)};
 
         } catch (NumberFormatException exception) {
-            MessageManager.warn("Invalid center slot type : &f" + slot);
-            return new int[]{};
+            throw new RuntimeException(exception);
         }
     }
 }

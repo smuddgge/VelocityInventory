@@ -21,8 +21,7 @@ public class RangeSlotType implements SlotType {
 
             return IntStream.range(start, end + 1).toArray();
         } catch (Exception exception) {
-            MessageManager.warn("Could not parse slot in inventory : &f" + slot);
-            return new int[0];
+            throw new RuntimeException(exception);
         }
     }
 }
