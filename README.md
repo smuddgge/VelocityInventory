@@ -1,2 +1,1 @@
-# VelocityInventory
-A Velocity Library that lets you create GUIs.
+[![](https://jitpack.io/v/Smuddgge/VelocityInventory.svg)](https://jitpack.io/#Smuddgge/VelocityInventory)
