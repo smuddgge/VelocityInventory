@@ -1,6 +1,5 @@
 package com.github.smuddgge.velocityinventory.slot.slot;
 
-import com.github.smuddgge.leaf.MessageManager;
 import com.github.smuddgge.velocityinventory.slot.SlotType;
 import dev.simplix.protocolize.data.inventory.InventoryType;
 
