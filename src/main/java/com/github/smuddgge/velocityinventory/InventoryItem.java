@@ -3,6 +3,7 @@ package com.github.smuddgge.velocityinventory;
 import com.github.smuddgge.squishyconfiguration.indicator.ConfigurationConvertable;
 import com.github.smuddgge.squishyconfiguration.interfaces.ConfigurationSection;
 import com.github.smuddgge.squishyconfiguration.memory.MemoryConfigurationSection;
+import com.github.smuddgge.velocityinventory.action.action.ClickAction;
 import com.github.smuddgge.velocityinventory.indicator.ItemStackConvertable;
 import com.github.smuddgge.velocityinventory.slot.SlotManager;
 import com.github.smuddgge.velocityinventory.slot.SlotType;
@@ -28,6 +29,7 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
 
     private final @NotNull ItemStack itemStack;
     private @NotNull List<Integer> slots;
+    private final @NotNull List<ClickAction> clickActionList;
 
     /**
      * Used to create an inventory item from an item stack.
@@ -37,19 +39,22 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
     public InventoryItem(@NotNull ItemStack itemStack) {
         this.itemStack = itemStack;
         this.slots = new ArrayList<>();
+        this.clickActionList = new ArrayList<>();
     }
 
     public InventoryItem(@NotNull BaseItemStack baseItemStack) {
         this.itemStack = new ItemStack(baseItemStack);
         this.slots = new ArrayList<>();
+        this.clickActionList = new ArrayList<>();
     }
 
-                         /**
+    /**
      * Used to create an inventory item of type AIR.
      */
     public InventoryItem() {
         this.itemStack = new ItemStack(ItemType.AIR);
         this.slots = new ArrayList<>();
+        this.clickActionList = new ArrayList<>();
     }
 
     /**
@@ -120,7 +125,7 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
                 section.set(
                         entry.getKey(),
                         this.getNbtAsSection(nbt.getCompoundTag(
-                                entry.getKey()),
+                                        entry.getKey()),
                                 new MemoryConfigurationSection(new HashMap<>())
                         ).getMap()
                 );
@@ -212,7 +217,7 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
         return this;
     }
 
-    public @NotNull InventoryItem setFlag(@NotNull ItemFlag flag,  boolean active) {
+    public @NotNull InventoryItem setFlag(@NotNull ItemFlag flag, boolean active) {
         this.itemStack.itemFlag(flag, active);
         return this;
     }
@@ -271,7 +276,7 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
      *
      * @param slotString The slot string, for example "center0".
      *                   See {@link SlotType} implementations for options.
-     * @param type The type of inventory.
+     * @param type       The type of inventory.
      * @return This instance.
      */
     public @NotNull InventoryItem addSlots(@NotNull String slotString, @NotNull InventoryType type) {
@@ -300,11 +305,31 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
      * Adds slots from start to end including start and end.
      *
      * @param start The start slot.
-     * @param end The end slot.
+     * @param end   The end slot.
      * @return This instance.
      */
     public @NotNull InventoryItem addSlots(int start, int end) {
         IntStream.range(start, end + 1).forEachOrdered(this::addSlots);
+        return this;
+    }
+
+    /**
+     * Used to get the list of click actions for this item.
+     *
+     * @return The list of click actions.
+     */
+    public @NotNull List<ClickAction> getClickActionList() {
+        return this.clickActionList;
+    }
+
+    /**
+     * Used to add a click action to this item.
+     *
+     * @param clickAction The instance of the click action.
+     * @return This instance.
+     */
+    public @NotNull InventoryItem addClickAction(@NotNull ClickAction clickAction) {
+        this.clickActionList.add(clickAction);
         return this;
     }
 

@@ -3,14 +3,22 @@ package com.github.smuddgge.velocityinventory;
 import com.github.smuddgge.squishyconfiguration.indicator.ConfigurationConvertable;
 import com.github.smuddgge.squishyconfiguration.interfaces.ConfigurationSection;
 import com.github.smuddgge.squishyconfiguration.memory.MemoryConfigurationSection;
+import com.github.smuddgge.velocityinventory.action.Action;
+import com.github.smuddgge.velocityinventory.action.ActionManager;
+import com.github.smuddgge.velocityinventory.action.ActionResult;
+import com.github.smuddgge.velocityinventory.action.action.ClickAction;
 import com.velocitypowered.api.proxy.Player;
+import dev.simplix.protocolize.api.Protocolize;
 import dev.simplix.protocolize.api.item.BaseItemStack;
+import dev.simplix.protocolize.api.player.ProtocolizePlayer;
 import dev.simplix.protocolize.data.inventory.InventoryType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 /**
  * Represents a customisable inventory.
@@ -18,6 +26,9 @@ import java.util.stream.IntStream;
 public class Inventory implements ConfigurationConvertable<Inventory> {
 
     private final @NotNull dev.simplix.protocolize.api.inventory.Inventory inventory;
+    private @NotNull List<Action> actionList;
+    private final @NotNull Map<ClickAction, List<Integer>> clickActionMap;
+    private final @NotNull ActionManager actionManager;
 
     /**
      * Used to create a new instance of an inventory.
@@ -26,6 +37,19 @@ public class Inventory implements ConfigurationConvertable<Inventory> {
      */
     public Inventory(@NotNull InventoryType type) {
         this.inventory = new dev.simplix.protocolize.api.inventory.Inventory(type);
+        this.actionList = new ArrayList<>();
+        this.clickActionMap = new HashMap<>();
+        this.actionManager = new ActionManager(this);
+    }
+
+    /**
+     * Used to get the base inventory that is being used.
+     * The protocolize inventory.
+     *
+     * @return This instance.
+     */
+    public @NotNull dev.simplix.protocolize.api.inventory.Inventory getBaseInventory() {
+        return this.inventory;
     }
 
     /**
@@ -55,6 +79,27 @@ public class Inventory implements ConfigurationConvertable<Inventory> {
      */
     public BaseItemStack getItem(int index) {
         return this.inventory.item(index);
+    }
+
+    /**
+     * Used to get the action list for a specific type of action.
+     *
+     * @param type The type of action.
+     * @param <T>  The type of action.
+     * @return The list of actions.
+     */
+    @SuppressWarnings("unchecked")
+    public @NotNull <T> List<T> getAction(@NotNull Class<T> type) {
+        List<T> list = new ArrayList<>();
+        for (Action action : this.actionList) {
+            if (!type.isInstance(action)) continue;
+            list.add((T) action);
+        }
+        return list;
+    }
+
+    public @Nullable List<Integer> getClickActionSlots(@NotNull ClickAction action) {
+        return this.clickActionMap.get(action);
     }
 
     /**
@@ -90,6 +135,48 @@ public class Inventory implements ConfigurationConvertable<Inventory> {
         for (int slot : item.getSlotList()) {
             this.inventory.item(slot, item.convertToItemStack());
         }
+
+        for (ClickAction clickAction : item.getClickActionList()) {
+            this.addAction(clickAction);
+            this.clickActionMap.put(clickAction, item.getSlots());
+        }
+        return this;
+    }
+
+    /**
+     * Used to add an action that will be triggered depending on
+     * what type of action it is.
+     *
+     * @param action The instance of the action.
+     * @return This instance.
+     */
+    public @NotNull Inventory addAction(@NotNull Action action) {
+        this.actionList.add(action);
+        return this;
+    }
+
+    /**
+     * Used to remove all the inventory actions.
+     *
+     * @return This instance.
+     */
+    public @NotNull Inventory removeActions() {
+        this.actionList = new ArrayList<>();
+        return this;
+    }
+
+    /**
+     * Used to remove all the items from the inventory.
+     *
+     * @return This instance.
+     */
+    public @NotNull Inventory clearInventory() {
+
+        // Loop though all the items and remove them.
+        for (Map.Entry<Integer, BaseItemStack> entry : this.inventory.items().entrySet()) {
+            this.inventory.removeItem(entry.getKey());
+        }
+
         return this;
     }
 
@@ -99,6 +186,13 @@ public class Inventory implements ConfigurationConvertable<Inventory> {
      * @return This instance.
      */
     public @NotNull Inventory open(@NotNull Player player) {
+
+        // Run the open action.
+        ActionResult result = this.actionManager.onOpen(player, this);
+        if (result.isCancelTrue()) return this;
+
+        ProtocolizePlayer protocolizePlayer = Protocolize.playerProvider().player(player.getUniqueId());
+        protocolizePlayer.openInventory(this.inventory);
         return this;
     }
 
@@ -121,7 +215,7 @@ public class Inventory implements ConfigurationConvertable<Inventory> {
 
     @Override
     public @NotNull Inventory convert(@NotNull ConfigurationSection section) {
-        
+
         this.setType(InventoryType.valueOf(section.getString("type", "GENERIC_9X3").toUpperCase()));
         this.setTitle(section.getString("title"));
 
