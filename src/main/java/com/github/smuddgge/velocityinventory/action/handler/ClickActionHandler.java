@@ -15,12 +15,12 @@ public class ClickActionHandler implements ActionHandler {
 
     @Override
     public @NotNull ActionResult onOpen(@NotNull Player player, @NotNull Inventory inventory) {
-        return null;
+        return new ActionResult();
     }
 
     @Override
     public @NotNull ActionResult onClose(@NotNull InventoryClose inventoryClose, @NotNull Inventory inventory) {
-        return null;
+        return new ActionResult();
     }
 
     @Override

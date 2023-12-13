@@ -13,7 +13,7 @@ public class CloseActionHandler implements ActionHandler {
 
     @Override
     public @NotNull ActionResult onOpen(@NotNull Player player, @NotNull Inventory inventory) {
-        return null;
+        return new ActionResult();
     }
 
     @Override
@@ -30,6 +30,6 @@ public class CloseActionHandler implements ActionHandler {
 
     @Override
     public @NotNull ActionResult onClick(@NotNull InventoryClick inventoryClick, @NotNull Inventory inventory) {
-        return null;
+        return new ActionResult();
     }
 }

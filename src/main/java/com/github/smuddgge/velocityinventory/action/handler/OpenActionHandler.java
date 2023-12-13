@@ -25,11 +25,11 @@ public class OpenActionHandler implements ActionHandler {
 
     @Override
     public @NotNull ActionResult onClose(@NotNull InventoryClose inventoryClose, @NotNull Inventory inventory) {
-        return null;
+        return new ActionResult();
     }
 
     @Override
     public @NotNull ActionResult onClick(@NotNull InventoryClick inventoryClick, @NotNull Inventory inventory) {
-        return null;
+        return new ActionResult();
     }
 }
