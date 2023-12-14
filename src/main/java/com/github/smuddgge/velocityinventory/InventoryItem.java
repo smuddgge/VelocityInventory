@@ -148,7 +148,7 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
      */
     public @NotNull InventoryItem setName(@Nullable String name) {
         if (name == null) return this;
-        this.itemStack.displayName(name);
+        this.itemStack.displayName(MessageParser.parseToComponent(name, null));
         return this;
     }
 
@@ -163,7 +163,13 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
     }
 
     public @NotNull InventoryItem setLore(@NotNull String... lore) {
-        this.itemStack.lore(Arrays.asList(lore), true);
+        List<String> list = new ArrayList<>(Arrays.asList(lore));
+        List<Component> parsedList = new ArrayList<>();
+        for (String line : list) {
+            parsedList.add(MessageParser.parseToComponent(line, null));
+        }
+
+        this.itemStack.lore(parsedList, false);
         return this;
     }
 
@@ -190,8 +196,8 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
     }
 
     public @NotNull InventoryItem addLore(@NotNull List<String> lore) {
-        List<String> loreList = this.itemStack.lore(true);
-        loreList.addAll(lore);
+        List<Component> loreList = this.itemStack.lore(false);
+        lore.forEach(string -> loreList.add(MessageParser.parseToComponent(string, null)));
         this.itemStack.lore(loreList, true);
         return this;
     }
