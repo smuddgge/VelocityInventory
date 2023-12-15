@@ -267,6 +267,15 @@ public class InventoryItem implements ItemStackConvertable, ConfigurationConvert
         return nbt;
     }
 
+    public int getCustomModelData() {
+        return this.itemStack.nbtData().getInt("CustomModelData");
+    }
+
+    public @NotNull InventoryItem setCustomModelData(int customModelData) {
+        this.itemStack.nbtData().putInt("CustomModelData", customModelData);
+        return this;
+    }
+
     public @NotNull List<Integer> getSlots() {
         return this.slots;
     }
