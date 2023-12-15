@@ -57,6 +57,14 @@
             <artifactId>SquishyConfiguration</artifactId>
             <version>1.7.0</version>
         </dependency>
+
+        <!-- MiniPlaceholders -->
+        <dependency>
+            <groupId>io.github.miniplaceholders</groupId>
+            <artifactId>miniplaceholders-api</artifactId>
+            <version>2.2.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
